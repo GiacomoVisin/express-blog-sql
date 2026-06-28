@@ -1,20 +1,18 @@
 const array = require(`../data/data`)
+const connection = require(`../database/connection`)
 
 function index(req, res) {
 
-    let filteredArray = array
+    const sql = `SELECT * FROM posts`;
+    connection.query(sql, (err, array) => {
+        console.log(err);
 
-    if (!req.query.tag) {
-        return res.json(filteredArray)
-    }
-
-    filteredArray = array.filter((obj) => obj.tag.includes(req.query.tag))
-
-
-    if (filteredArray.length === 0) {
-        return res.json(array)
-    }
-    return res.json(filteredArray)
+        if (err) {
+            console.error(`Error in the execution of the query:`, err);
+            return res.status(500).json({ error: true, message: "internal server error" })
+        }
+        res.json(array)
+    })
 }
 
 
@@ -51,10 +49,10 @@ function Store(req, res) {
 
     array.push(newProduct)
 
-  res.json({
-    status: "200",
-    product: newProduct
-  })
+    res.json({
+        status: "200",
+        product: newProduct
+    })
 
 
     console.log(array);
@@ -76,10 +74,10 @@ function Update(req, res) {
     }
 
     product.id = ID,
-    product.titolo = req.body.titolo,
-    product.contenuto = req.body.contenuto,
-    product.immagine = req.body.immagine,
-    product.tag = [req.body.tag]
+        product.titolo = req.body.titolo,
+        product.contenuto = req.body.contenuto,
+        product.immagine = req.body.immagine,
+        product.tag = [req.body.tag]
 
     console.log(product);
     res.json({
