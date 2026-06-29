@@ -25,7 +25,7 @@ function Show(req, res) {
     const postSql = 'SELECT * FROM posts WHERE id = ?';
 
     const postWithTag = `
-        SELECT tags.* FROM tags
+        SELECT * FROM tags
         JOIN post_tag ON tags.id = post_tag.tag_id
         WHERE post_tag.post_id = ?
     `;
