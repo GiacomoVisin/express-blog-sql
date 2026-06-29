@@ -20,15 +20,31 @@ function index(req, res) {
 
 
 function Show(req, res) {
-   
-const {id} = req.params
+    const { id } = req.params;
 
-  const sql = 'SELECT * FROM posts WHERE id = ?';
-  connection.query(sql, [id], (err, results) => {
-    if (err) return res.status(500).json({ error: 'Error in the execution of the query' });
-    if (results.length === 0) return res.status(404).json({ error: 'Post not found' });
-    res.json(results[0]);
-  });
+    const postSql = 'SELECT * FROM posts WHERE id = ?';
+
+    const postWithTag = `
+        SELECT tags.* FROM tags
+        JOIN post_tag ON tags.id = post_tag.tag_id
+        WHERE post_tag.post_id = ?
+    `;
+
+    connection.query(postSql, [id], (err, results) => {
+        if (err) return res.status(500).json({ error: 'Error in the execution of the query' });
+        if (results.length === 0) return res.status(404).json({ error: 'Post not found' });
+
+        const post = results[0];
+
+        connection.query(postWithTag, [id], (err, PostTag) => {
+            if (err) return res.status(500).json({ error: 'Error in the execution of the query' });
+
+           
+            post.tags = PostTag;
+
+            res.json(post);
+        });
+    });
 }
 
 
@@ -89,12 +105,12 @@ function Modify(req, res) {
 }
 
 function Delete(req, res) {
-    
-    const {id} = req.params
-    connection.query(`DELETE FROM posts WHERE id = ?`, [id], (err)=>{
-        if (err) return res.status(500).json({error:"Deleting failed"})
+
+    const { id } = req.params
+    connection.query(`DELETE FROM posts WHERE id = ?`, [id], (err) => {
+        if (err) return res.status(500).json({ error: "Deleting failed" })
     })
-  
+
     res.sendStatus(204)
 }
 
