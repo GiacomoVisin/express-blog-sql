@@ -20,20 +20,18 @@ function index(req, res) {
 
 
 function Show(req, res) {
-    const id = parseInt(req.params.id)
-    const singleOBJ = array.find((obj) => obj.id === id)
+   
+const {id} = req.params
 
-    if (!singleOBJ) {
-
-        res.status(404)
-
-        return res.json({
-            error: "Not Found",
-            message: "Object doesn't exist"
-        })
-    }
-    res.json(singleOBJ)
+  const sql = 'SELECT * FROM posts WHERE id = ?';
+  connection.query(sql, [id], (err, results) => {
+    if (err) return res.status(500).json({ error: 'Error in the execution of the query' });
+    if (results.length === 0) return res.status(404).json({ error: 'Post not found' });
+    res.json(results[0]);
+  });
 }
+
+
 
 function Store(req, res) {
 
