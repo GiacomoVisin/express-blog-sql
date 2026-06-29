@@ -91,22 +91,12 @@ function Modify(req, res) {
 }
 
 function Delete(req, res) {
-    const id = parseInt(req.params.id)
-    const product = array.find((product) => product.id === id)
-
-    if (!product) {
-        res.status(404)
-        return res.json({
-            error: "Not Found",
-            message: "Object doesn't exist"
-        })
-    }
-
-    array.splice(array.indexOf(product), 1)
-
-
-    console.log(array);
-
+    
+    const {id} = req.params
+    connection.query(`DELETE FROM posts WHERE id = ?`, [id], (err)=>{
+        if (err) return res.status(500).json({error:"Deleting failed"})
+    })
+  
     res.sendStatus(204)
 }
 
